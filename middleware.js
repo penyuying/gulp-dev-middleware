@@ -26,13 +26,9 @@ module.exports = function(options) {
     // The middleware function
     function devMiddleware(req, res, next) {
         function goNext() {
-            // if (!context.options.serverSideRender) return next();
-            // fileShared.ready(function() {
-            // res.locals.webpackStats = context.webpackStats;
             if (next instanceof Function) {
                 next();
             }
-            // }, req);
         }
 
         if (req.method !== 'GET') {
@@ -41,11 +37,9 @@ module.exports = function(options) {
 
         var filename = getFilenameFromUrl('', globeData.outputPath, req.url);
         if (filename === false) return goNext();
-        // _destPath=encodeURIComponent(_destPath);//防止名称和取的时候不一样
-        filename=decodeURIComponent(filename);
+        filename=decodeURIComponent(filename);// 转码特殊字符
         filename = path.normalize(filename).replace(/\\/g, '/');
 
-        // console.log('filenamefilename:',filename)
         fileShared.handleRequest(filename, processRequest, req);
         /**
          * 读取文件的回调
@@ -53,9 +47,6 @@ module.exports = function(options) {
          * @returns
          */
         function processRequest() {
-
-            // console.log('filename2:',filename);
-            // console.log(filename, 'stat');
             try {
                 var stat = globeData.fs.statSync(filename);
                 if (!stat.isFile()) {
@@ -71,10 +62,6 @@ module.exports = function(options) {
                 return goNext();
             }
 
-            // globeData.fs.stat(filename,function(err, targetStat){
-            //     console.log('targetStat:',targetStat);
-            // });
-            // server content
             setTimeout(function() {//页面取到的数据不是最新的
                 var content = globeData.fs.readFileSync(filename);
                 content = fileShared.handleRangeHeaders(content, req, res);
@@ -117,17 +104,9 @@ module.exports = function(options) {
 
             // 插件不支持对 Stream 对直接操作，跑出异常
             if (file.isStream()) {
-                // this.emit('error', new gutil.PluginError(PLUGIN_NAME, 'Streaming not supported'));
                 this.push(file);
                 return cb();
             }
-            // var _filepath = file.path,
-            //     _extname = path.extname(_filepath);
-
-            // if (_extname && _extname.toLowerCase() === '.wxss') {
-            //     var content = contentHandle(file.contents.toString(), options);
-            //     file.contents = new Buffer(content);
-            // }
 
             fileShared.dest(utils.absPath(destDir), file, _options);//存放文件到内存
 
@@ -157,10 +136,5 @@ module.exports = function(options) {
         var _fs=fileShared.getFs();
         _fs.watch.apply(_fs,arguments)
     };
-    // devMiddleware.getFilenameFromUrl = getFilenameFromUrl.bind(this, context.options.publicPath, context.compiler.outputPath);
-    // devMiddleware.waitUntilValid = shared.waitUntilValid;
-    // devMiddleware.invalidate = shared.invalidate;
-    // devMiddleware.close = shared.close;
-    // devMiddleware.fileSystem = context.fs;
     return devMiddleware;
 };
