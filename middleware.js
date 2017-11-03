@@ -41,7 +41,8 @@ module.exports = function(options) {
 
         var filename = getFilenameFromUrl('', globeData.outputPath, req.url);
         if (filename === false) return goNext();
-
+        // _destPath=encodeURIComponent(_destPath);//防止名称和取的时候不一样
+        filename=decodeURIComponent(filename);
         filename = path.normalize(filename).replace(/\\/g, '/');
 
         // console.log('filenamefilename:',filename)
